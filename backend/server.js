@@ -1,12 +1,27 @@
 import express from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import './config/db.js';
 
 const app = express();
-const PORT = 5000;
+
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+
+const PORT = 3000;
 
 app.get("/", (req, res) => {
   res.send("Backend is running!");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const server = app.listen(PORT, () => {
+  console.log(`Server running on port: ${PORT}`);
+});
+
+server.on('error', (err) => {
+  console.error('Szerver hiba:', err.message);
 });
