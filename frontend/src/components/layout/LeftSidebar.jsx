@@ -1,12 +1,20 @@
 import { Link, useLocation } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
-const nav = [
+const publicNav = [
   { to: "/", label: "Home" },
+  { to: "/explore", label: "Explore" },
+];
+
+const privateNav = [
+  { to: "/snippets", label: "Snippets" },
 ];
 
 export default function LeftSidebar() {
   const { pathname } = useLocation();
+  const { user, logout } = useAuth();
+
+  const navItems = user ? [...publicNav, ...privateNav] : publicNav;
 
   return (
     <aside className="hidden md:flex w-72 flex-col border-r border-(--app-border) bg-(--app-alt)">
@@ -27,7 +35,7 @@ export default function LeftSidebar() {
       </div>
 
       <nav className="p-3 space-y-1">
-        {nav.map((item) => {
+        {navItems.map((item) => {
           const active = pathname === item.to;
           return (
             <Link
@@ -61,11 +69,38 @@ export default function LeftSidebar() {
         })}
       </nav>
 
-      {/* User section */}
       <div className="mt-auto p-4 border-t border-(--app-border) space-y-3">
-        <button className="w-full rounded-2xl px-4 py-2 text-sm font-medium text-white" style={{ background: "linear-gradient(135deg, var(--app-primary), var(--app-secondary))" }}>Register</button>
-        <button className="w-full rounded-2xl border border-(--app-border) bg-(--app-surface-2) px-4 py-2 text-sm hover:border-(--app-accent) transition">Login</button>
-         <button className="w-full rounded-2xl border border-(--app-border) bg-(--app-surface-2) px-4 py-2 text-sm hover:border-(--app-accent) transition">Logout</button>
+        {user ? (
+          <>
+            <div className="flex items-center gap-3 px-2 py-1">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium text-white"
+                style={{ background: "linear-gradient(135deg, var(--app-primary), var(--app-secondary))" }}>
+                {user.username[0].toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <div className="text-sm font-medium truncate">{user.username}</div>
+                <div className="text-xs text-(--app-text-dim) truncate">{user.role}</div>
+              </div>
+            </div>
+            <button
+              onClick={logout}
+              className="w-full rounded-2xl border border-(--app-border) bg-(--app-surface-2) px-4 py-2 text-sm hover:border-(--app-accent) transition">
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/register"
+              className="block w-full rounded-2xl px-4 py-2 text-sm font-medium text-white text-center"
+              style={{ background: "linear-gradient(135deg, var(--app-primary), var(--app-secondary))" }}>
+              Register
+            </Link>
+            <Link to="/login"
+              className="block w-full rounded-2xl border border-(--app-border) bg-(--app-surface-2) px-4 py-2 text-sm hover:border-(--app-accent) transition text-center">
+              Login
+            </Link>
+          </>
+        )}
       </div>
     </aside>
   );

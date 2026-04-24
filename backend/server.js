@@ -2,6 +2,8 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import './config/db.js';
+import authRoutes from './routes/auth.js';
+import snippetRoutes from './routes/snippets.js';
 
 const app = express();
 
@@ -11,6 +13,9 @@ app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true
 }));
+
+app.use('/api/auth', authRoutes);
+app.use('/api/snippets', snippetRoutes);
 
 const PORT = 3000;
 
