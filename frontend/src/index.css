@@ -1,32 +1,80 @@
 @import "tailwindcss";
 
 :root {
-  --app-bg: #f7f8fb;          /* page background */
-  --app-alt: #ffffff;         /* sidebars / panels */
-  --app-surface: #ffffff;     /* cards */
-  --app-surface-2: #f2f4f8;   /* subtle fills */
+  --app-bg: #f7f8fb; /* page background */
+  --app-alt: #ffffff; /* sidebars / panels */
+  --app-surface: #ffffff; /* cards */
+  --app-surface-2: #f2f4f8; /* subtle fills */
 
-  --app-primary: #4f46e5;     /* indigo */
-  --app-secondary: #06b6d4;   /* cyan */
+  --app-primary: #4f46e5; /* indigo */
+  --app-secondary: #06b6d4; /* cyan */
 
-  --app-border: rgba(15, 23, 42, 0.10);
+  --app-border: rgba(15, 23, 42, 0.1);
   --app-accent: rgba(79, 70, 229, 0.25);
 
   --app-text: rgba(15, 23, 42, 0.92);
   --app-text-dim: rgba(15, 23, 42, 0.62);
 
-  --app-shadow: 0 18px 50px rgba(2, 6, 23, 0.10);
+  --app-shadow: 0 18px 50px rgba(2, 6, 23, 0.1);
 }
 
 html,
 body {
   height: 100%;
   background:
-    radial-gradient(900px 700px at 10% 0%, rgba(79, 70, 229, 0.10), transparent 60%),
-    radial-gradient(900px 700px at 100% 10%, rgba(6, 182, 212, 0.08), transparent 55%),
+    radial-gradient(
+      900px 700px at 10% 0%,
+      rgba(79, 70, 229, 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 700px at 100% 10%,
+      rgba(6, 182, 212, 0.08),
+      transparent 55%
+    ),
     var(--app-bg);
   color: var(--app-text);
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.25s ease-out;
+}
+
+/* progress bar (FIXED, működik) */
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  animation: shrink 3s linear forwards;
+}
+
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}

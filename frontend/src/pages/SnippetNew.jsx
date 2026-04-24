@@ -1,25 +1,38 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createSnippet } from '../api/snippetApi';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createSnippet } from "../api/snippetApi";
+import { useToast } from "../context/ToastContext";
 
-const LANGUAGES = ['javascript', 'typescript', 'python', 'sql', 'css', 'html', 'bash', 'json', 'yaml', 'other'];
+const LANGUAGES = [
+  "javascript",
+  "typescript",
+  "python",
+  "sql",
+  "css",
+  "html",
+  "bash",
+  "json",
+  "yaml",
+  "other",
+];
 
 export default function SnippetNew() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    title: '',
-    description: '',
-    code: '',
-    language: 'javascript',
-    tags: '',
+    title: "",
+    description: "",
+    code: "",
+    language: "javascript",
+    tags: "",
     is_public: false,
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
+    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
   const handleSubmit = async (e) => {
@@ -28,14 +41,15 @@ export default function SnippetNew() {
     setLoading(true);
     try {
       const tags = form.tags
-        .split(',')
+        .split(",")
         .map((t) => t.trim().toLowerCase())
         .filter((t) => t.length > 0);
 
       await createSnippet({ ...form, tags });
-      navigate('/snippets');
+      showToast("Snippet created successfully", "success");
+      navigate("/snippets");
     } catch (err) {
-      setError(err.response?.data?.error || 'Valami hiba történt.');
+      setError(err.response?.data?.error || "Valami hiba történt.");
     } finally {
       setLoading(false);
     }
@@ -44,35 +58,40 @@ export default function SnippetNew() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Új snippet</h1>
-        <p className="text-sm text-(--app-text-dim) mt-1">Hozz létre egy új kódrészletet</p>
+        <h1 className="text-2xl font-semibold">New snippet</h1>
+        <p className="text-sm text-(--app-text-dim) mt-1">
+          Create a new code snippet
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="rounded-3xl border border-(--app-border) bg-(--app-alt) p-6 space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-3xl border border-(--app-border) bg-(--app-alt) p-6 space-y-4"
+      >
         <div className="space-y-1">
-          <label className="text-xs text-(--app-text-dim)">Cím *</label>
+          <label className="text-xs text-(--app-text-dim)">Title *</label>
           <input
             name="title"
             value={form.title}
             onChange={handleChange}
-            placeholder="pl. useDebounce hook"
+            placeholder="e.g. useDebounce hook"
             className="w-full rounded-xl border border-(--app-border) bg-(--app-surface-2) px-3 py-2 text-sm outline-none focus:border-(--app-accent) transition"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-(--app-text-dim)">Leírás</label>
+          <label className="text-xs text-(--app-text-dim)">Description</label>
           <input
             name="description"
             value={form.description}
             onChange={handleChange}
-            placeholder="Rövid leírás..."
+            placeholder="Short description..."
             className="w-full rounded-xl border border-(--app-border) bg-(--app-surface-2) px-3 py-2 text-sm outline-none focus:border-(--app-accent) transition"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-(--app-text-dim)">Nyelv *</label>
+          <label className="text-xs text-(--app-text-dim)">Language *</label>
           <select
             name="language"
             value={form.language}
@@ -80,30 +99,34 @@ export default function SnippetNew() {
             className="w-full rounded-xl border border-(--app-border) bg-(--app-surface-2) px-3 py-2 text-sm outline-none focus:border-(--app-accent) transition"
           >
             {LANGUAGES.map((lang) => (
-              <option key={lang} value={lang}>{lang}</option>
+              <option key={lang} value={lang}>
+                {lang}
+              </option>
             ))}
           </select>
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-(--app-text-dim)">Kód *</label>
+          <label className="text-xs text-(--app-text-dim)">Code *</label>
           <textarea
             name="code"
             value={form.code}
             onChange={handleChange}
-            placeholder="// ide jön a kód..."
+            placeholder="// here comes to code..."
             rows={10}
             className="w-full rounded-xl border border-(--app-border) bg-(--app-surface-2) px-3 py-2 text-sm outline-none focus:border-(--app-accent) transition font-mono resize-y"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-(--app-text-dim)">Tagek (vesszővel elválasztva)</label>
+          <label className="text-xs text-(--app-text-dim)">
+            Tags (separated by commas)
+          </label>
           <input
             name="tags"
             value={form.tags}
             onChange={handleChange}
-            placeholder="pl. react, hooks, performance"
+            placeholder="e.g. react, hooks, performance"
             className="w-full rounded-xl border border-(--app-border) bg-(--app-surface-2) px-3 py-2 text-sm outline-none focus:border-(--app-accent) transition"
           />
         </div>
@@ -118,7 +141,7 @@ export default function SnippetNew() {
             className="accent-(--app-primary)"
           />
           <label htmlFor="is_public" className="text-sm cursor-pointer">
-            Publikus snippet (mindenki láthatja az Explore oldalon)
+            Public snippet (everyone can see it in the Explorer)
           </label>
         </div>
 
@@ -133,16 +156,19 @@ export default function SnippetNew() {
             type="submit"
             disabled={loading}
             className="rounded-2xl px-4 py-2 text-sm font-medium text-white disabled:opacity-60 transition"
-            style={{ background: 'linear-gradient(135deg, var(--app-primary), var(--app-secondary))' }}
+            style={{
+              background:
+                "linear-gradient(135deg, var(--app-primary), var(--app-secondary))",
+            }}
           >
-            {loading ? 'Mentés...' : 'Mentés'}
+            {loading ? "Save..." : "Save"}
           </button>
           <button
             type="button"
-            onClick={() => navigate('/snippets')}
+            onClick={() => navigate("/snippets")}
             className="rounded-2xl border border-(--app-border) bg-(--app-surface-2) px-4 py-2 text-sm hover:border-(--app-accent) transition"
           >
-            Mégse
+            Back
           </button>
         </div>
       </form>

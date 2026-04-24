@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ identifier: '', password: '' });
+  const [form, setForm] = useState({ identifier: "", password: "" });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -20,9 +20,9 @@ export default function Login() {
     setLoading(true);
     try {
       await login(form);
-      navigate('/');
+      navigate("/");
     } catch (err) {
-      setError(err.response?.data?.error || 'Valami hiba történt.');
+      setError(err.response?.data?.error || "Valami hiba történt.");
     } finally {
       setLoading(false);
     }
@@ -32,13 +32,17 @@ export default function Login() {
     <div className="flex items-center justify-center min-h-[80vh]">
       <div className="w-full max-w-md rounded-3xl border border-(--app-border) bg-(--app-alt) p-8 space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold">Bejelentkezés</h1>
-          <p className="text-sm text-(--app-text-dim) mt-1">Lépj be a fiókodba</p>
+          <h1 className="text-2xl font-semibold">Login</h1>
+          <p className="text-sm text-(--app-text-dim) mt-1">
+            Log into your account
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs text-(--app-text-dim)">Email vagy felhasználónév</label>
+            <label className="text-xs text-(--app-text-dim)">
+              Email or username
+            </label>
             <input
               name="identifier"
               value={form.identifier}
@@ -49,7 +53,7 @@ export default function Login() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs text-(--app-text-dim)">Jelszó</label>
+            <label className="text-xs text-(--app-text-dim)">Password</label>
             <input
               name="password"
               type="password"
@@ -70,16 +74,19 @@ export default function Login() {
             type="submit"
             disabled={loading}
             className="w-full rounded-2xl px-4 py-2 text-sm font-medium text-white disabled:opacity-60 transition"
-            style={{ background: 'linear-gradient(135deg, var(--app-primary), var(--app-secondary))' }}
+            style={{
+              background:
+                "linear-gradient(135deg, var(--app-primary), var(--app-secondary))",
+            }}
           >
-            {loading ? 'Bejelentkezés...' : 'Bejelentkezés'}
+            {loading ? "Login..." : "Login"}
           </button>
         </form>
 
         <p className="text-center text-sm text-(--app-text-dim)">
-          Még nincs fiókod?{' '}
+          Don't have an account?{" "}
           <Link to="/register" className="text-(--app-primary) hover:underline">
-            Regisztrálj
+            Register
           </Link>
         </p>
       </div>

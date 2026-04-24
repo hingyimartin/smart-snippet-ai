@@ -3,12 +3,13 @@ import LeftSidebar from "./LeftSidebar";
 import RightPanel from "./RightPanel";
 
 export default function Layout({ children }) {
-  const [rightOpen, setRightOpen] = useState(true);
+  const [rightOpen, setRightOpen] = useState(false);
 
   useEffect(() => {
-    const v = localStorage.getItem("rightPanelOpen");
-    if (v != null) setRightOpen(v === "true");
+    const panel = localStorage.getItem("rightPanelOpen");
+    if (panel != null) setRightOpen(panel === "true");
   }, []);
+
   useEffect(() => {
     localStorage.setItem("rightPanelOpen", String(rightOpen));
   }, [rightOpen]);
@@ -20,7 +21,6 @@ export default function Layout({ children }) {
 
         <div className="flex flex-1 min-w-0">
           <div className="flex-1 min-w-0 flex flex-col">
-
             <main className="flex-1 min-w-0 overflow-y-auto no-scrollbar px-4 md:px-6 py-6">
               <div className="mx-auto w-full">{children}</div>
             </main>

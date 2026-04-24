@@ -2,33 +2,27 @@ export default function RightPanel({ open, setOpen }) {
   return (
     <>
       <aside
-        className={[
-          "hidden md:flex flex-col border-l border-(--app-border) bg-(--app-alt)",
-          "transition-[width] duration-300 ease-out overflow-hidden",
-          open ? "w-90" : "w-0",
-        ].join(" ")}
+        className={`hidden md:flex flex-col border-l border-(--app-border) bg-(--app-alt) transition-[width] duration-300 ease-out overflow-hidden ${open ? "w-90" : "w-0"}`}
       >
         <div className="sticky top-0 z-10 border-b border-(--app-border) bg-(--app-alt)/85 backdrop-blur">
           <div className="px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="font-semibold">Insights</span>
-              <span className="text-xs text-(--app-text-dim)">Explain • Improve • Test</span>
+              <span className="text-xs text-(--app-text-dim)">
+                Explain • Improve • Test
+              </span>
             </div>
 
             <button
               onClick={() => setOpen(false)}
               className="rounded-lg border border-(--app-border) bg-(--app-surface-2) px-2 py-1 text-sm text-(--app-text-dim) hover:text-(--app-text) hover:border-(--app-accent) transition"
-              aria-label="Hide panel"
-              title="Hide"
             >
               →
             </button>
           </div>
         </div>
 
-        <div className="p-4 space-y-3">
-          
-        </div>
+        <div className="p-4 space-y-3"></div>
       </aside>
 
       {!open && (
@@ -39,7 +33,10 @@ export default function RightPanel({ open, setOpen }) {
           aria-label="Show panel"
           title="Show AI Insights"
         >
-          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "var(--app-secondary)" }} />
+          <span
+            className="h-2 w-2 rounded-full"
+            style={{ backgroundColor: "var(--app-secondary)" }}
+          />
           <span className="text-(--app-text-dim)">AI</span>
           <span className="font-medium">←</span>
         </button>

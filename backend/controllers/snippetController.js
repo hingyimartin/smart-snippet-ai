@@ -1,4 +1,4 @@
-import pool from '../config/db.js';
+import pool from "../config/db.js";
 
 export const createSnippet = async (req, res) => {
   const { title, description, code, language, tags, is_public } = req.body;
@@ -6,8 +6,8 @@ export const createSnippet = async (req, res) => {
 
   if (!title || !code || !language) {
     return res.status(400).json({
-      error: 'Cím, kód és nyelv megadása kötelező.',
-      required: ['title', 'code', 'language']
+      error: "Fields with * are required",
+      required: ["title", "code", "language"],
     });
   }
 
@@ -16,13 +16,20 @@ export const createSnippet = async (req, res) => {
       `INSERT INTO snippets (user_id, title, description, code, language, tags, is_public)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [userId, title, description || null, code, language, tags || [], is_public || false]
+      [
+        userId,
+        title,
+        description || null,
+        code,
+        language,
+        tags || [],
+        is_public || false,
+      ],
     );
 
     res.status(201).json({ snippet: result.rows[0] });
   } catch (err) {
-    console.error('Create snippet hiba:', err);
-    res.status(500).json({ error: 'Szerver hiba.' });
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -31,14 +38,22 @@ export const getSnippets = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT * FROM snippets WHERE user_id = $1 ORDER BY created_at DESC`,
-      [userId]
+      `SELECT s.*,
+        COUNT(v.id) FILTER (WHERE v.vote_type = true)  AS upvotes,
+        COUNT(v.id) FILTER (WHERE v.vote_type = false) AS downvotes,
+        BOOL_OR(CASE WHEN v.user_id = $1 THEN v.vote_type ELSE NULL END) AS user_vote
+        FROM snippets s
+        LEFT JOIN snippet_votes v ON s.id = v.snippet_id
+        WHERE s.user_id = $1
+        GROUP BY s.id
+        ORDER BY s.created_at DESC`,
+      [userId],
     );
 
     res.json({ snippets: result.rows });
   } catch (err) {
-    console.error('Get snippets hiba:', err);
-    res.status(500).json({ error: 'Szerver hiba.' });
+    console.error("Get snippets hiba:", err);
+    res.status(500).json({ error: "Szerver hiba." });
   }
 };
 
@@ -49,17 +64,16 @@ export const getSnippetById = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT * FROM snippets WHERE id = $1 AND user_id = $2`,
-      [id, userId]
+      [id, userId],
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Snippet nem található.' });
+      return res.status(404).json({ error: "Snippet could not be found" });
     }
 
     res.json({ snippet: result.rows[0] });
   } catch (err) {
-    console.error('Get snippet hiba:', err);
-    res.status(500).json({ error: 'Szerver hiba.' });
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -71,11 +85,11 @@ export const updateSnippet = async (req, res) => {
   try {
     const existing = await pool.query(
       `SELECT * FROM snippets WHERE id = $1 AND user_id = $2`,
-      [id, userId]
+      [id, userId],
     );
 
     if (existing.rows.length === 0) {
-      return res.status(404).json({ error: 'Snippet nem található.' });
+      return res.status(404).json({ error: "Snippet could not be found" });
     }
 
     const result = await pool.query(
@@ -89,13 +103,12 @@ export const updateSnippet = async (req, res) => {
            updated_at = NOW()
        WHERE id = $7 AND user_id = $8
        RETURNING *`,
-      [title, description, code, language, tags, is_public, id, userId]
+      [title, description, code, language, tags, is_public, id, userId],
     );
 
     res.json({ snippet: result.rows[0] });
   } catch (err) {
-    console.error('Update snippet hiba:', err);
-    res.status(500).json({ error: 'Szerver hiba.' });
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -106,33 +119,40 @@ export const deleteSnippet = async (req, res) => {
   try {
     const result = await pool.query(
       `DELETE FROM snippets WHERE id = $1 AND user_id = $2 RETURNING id`,
-      [id, userId]
+      [id, userId],
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Snippet nem található.' });
+      return res.status(404).json({ error: "Snippet could not be found" });
     }
 
-    res.json({ message: 'Snippet törölve.' });
+    res.json({ message: "Snippet deleted" });
   } catch (err) {
-    console.error('Delete snippet hiba:', err);
-    res.status(500).json({ error: 'Szerver hiba.' });
+    res.status(500).json({ error: "Server error" });
   }
 };
 
 export const getPublicSnippets = async (req, res) => {
+  const userId = req.user?.id || null;
+
   try {
     const result = await pool.query(
-      `SELECT s.*, u.username 
+      `SELECT s.*, u.username,
+        COUNT(v.id) FILTER (WHERE v.vote_type = true)  AS upvotes,
+        COUNT(v.id) FILTER (WHERE v.vote_type = false) AS downvotes,
+        BOOL_OR(CASE WHEN v.user_id = $1 THEN v.vote_type ELSE NULL END) AS user_vote
        FROM snippets s
        JOIN users u ON s.user_id = u.id
+       LEFT JOIN snippet_votes v ON s.id = v.snippet_id
        WHERE s.is_public = true
-       ORDER BY s.created_at DESC`
+       GROUP BY s.id, u.username
+       ORDER BY s.created_at DESC`,
+      [userId],
     );
 
     res.json({ snippets: result.rows });
   } catch (err) {
-    console.error('Get public snippets hiba:', err);
-    res.status(500).json({ error: 'Szerver hiba.' });
+    console.error("Get public snippets hiba:", err);
+    res.status(500).json({ error: "Szerver hiba." });
   }
 };

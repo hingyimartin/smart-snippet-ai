@@ -10,33 +10,40 @@ export default function Landing() {
           </div>
 
           <h1 className="mt-5 text-4xl md:text-5xl font-semibold leading-tight">
-            Snippets, amiket{" "}
+            Snippets, that you <br />
             <span
               className="bg-clip-text text-transparent"
-              style={{ backgroundImage: "linear-gradient(135deg, var(--app-primary), var(--app-secondary))" }}
+              style={{
+                backgroundImage:
+                  "linear-gradient(135deg, var(--app-primary), var(--app-secondary))",
+              }}
             >
-              tényleg megértesz
+              really understand
             </span>
             .
           </h1>
 
           <p className="mt-4 text-(--app-text-dim)">
-            Tárold, rendszerezd, és kérj AI magyarázatot/optimalizálást. Letisztult layout, fókuszált munka.
+            Store, arrange, and request AI optimization and explanation. Clean
+            layout, focused work.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
-              to="/snippets"
+              to="/explore"
               className="rounded-2xl px-4 py-2 text-sm font-medium text-white"
-              style={{ background: "linear-gradient(135deg, var(--app-primary), var(--app-secondary))" }}
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--app-primary), var(--app-secondary))",
+              }}
             >
               Browse snippets
             </Link>
             <Link
-              to="/dashboard"
+              to="/register"
               className="rounded-2xl border border-(--app-border) bg-(--app-surface-2) px-4 py-2 text-sm hover:border-(--app-accent) transition"
             >
-              Open dashboard
+              Get Started
             </Link>
           </div>
         </div>

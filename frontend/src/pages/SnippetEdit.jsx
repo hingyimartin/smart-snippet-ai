@@ -1,8 +1,19 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { fetchSnippetById, updateSnippet } from '../api/snippetApi';
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchSnippetById, updateSnippet } from "../api/snippetApi";
 
-const LANGUAGES = ['javascript', 'typescript', 'python', 'sql', 'css', 'html', 'bash', 'json', 'yaml', 'other'];
+const LANGUAGES = [
+  "javascript",
+  "typescript",
+  "python",
+  "sql",
+  "css",
+  "html",
+  "bash",
+  "json",
+  "yaml",
+  "other",
+];
 
 export default function SnippetEdit() {
   const { id } = useParams();
@@ -17,19 +28,19 @@ export default function SnippetEdit() {
         const s = res.data.snippet;
         setForm({
           title: s.title,
-          description: s.description || '',
+          description: s.description || "",
           code: s.code,
           language: s.language,
-          tags: s.tags?.join(', ') || '',
+          tags: s.tags?.join(", ") || "",
           is_public: s.is_public,
         });
       })
-      .catch(() => setError('Nem sikerült betölteni a snippetet.'));
+      .catch(() => setError("Could not load snippet"));
   }, [id]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
+    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
   const handleSubmit = async (e) => {
@@ -38,32 +49,36 @@ export default function SnippetEdit() {
     setLoading(true);
     try {
       const tags = form.tags
-        .split(',')
+        .split(",")
         .map((t) => t.trim().toLowerCase())
         .filter((t) => t.length > 0);
 
       await updateSnippet(id, { ...form, tags });
-      navigate('/snippets');
+      navigate("/snippets");
     } catch (err) {
-      setError(err.response?.data?.error || 'Valami hiba történt.');
+      setError(err.response?.data?.error || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
   if (error) return <div className="text-red-500 text-sm">{error}</div>;
-  if (!form) return <div className="text-(--app-text-dim) text-sm">Betöltés...</div>;
+  if (!form)
+    return <div className="text-(--app-text-dim) text-sm">Loading...</div>;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Snippet szerkesztése</h1>
-        <p className="text-sm text-(--app-text-dim) mt-1">Módosítsd a kódrészletet</p>
+        <h1 className="text-2xl font-semibold">Edit snippet</h1>
+        <p className="text-sm text-(--app-text-dim) mt-1">Modify the snippet</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="rounded-3xl border border-(--app-border) bg-(--app-alt) p-6 space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-3xl border border-(--app-border) bg-(--app-alt) p-6 space-y-4"
+      >
         <div className="space-y-1">
-          <label className="text-xs text-(--app-text-dim)">Cím *</label>
+          <label className="text-xs text-(--app-text-dim)">Title *</label>
           <input
             name="title"
             value={form.title}
@@ -73,7 +88,7 @@ export default function SnippetEdit() {
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-(--app-text-dim)">Leírás</label>
+          <label className="text-xs text-(--app-text-dim)">Description</label>
           <input
             name="description"
             value={form.description}
@@ -83,7 +98,7 @@ export default function SnippetEdit() {
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-(--app-text-dim)">Nyelv *</label>
+          <label className="text-xs text-(--app-text-dim)">Language *</label>
           <select
             name="language"
             value={form.language}
@@ -91,13 +106,15 @@ export default function SnippetEdit() {
             className="w-full rounded-xl border border-(--app-border) bg-(--app-surface-2) px-3 py-2 text-sm outline-none focus:border-(--app-accent) transition"
           >
             {LANGUAGES.map((lang) => (
-              <option key={lang} value={lang}>{lang}</option>
+              <option key={lang} value={lang}>
+                {lang}
+              </option>
             ))}
           </select>
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-(--app-text-dim)">Kód *</label>
+          <label className="text-xs text-(--app-text-dim)">Code *</label>
           <textarea
             name="code"
             value={form.code}
@@ -108,12 +125,14 @@ export default function SnippetEdit() {
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-(--app-text-dim)">Tagek (vesszővel elválasztva)</label>
+          <label className="text-xs text-(--app-text-dim)">
+            Tags (separated by commas)
+          </label>
           <input
             name="tags"
             value={form.tags}
             onChange={handleChange}
-            placeholder="pl. react, hooks, performance"
+            placeholder="e.g. react, hooks, performance"
             className="w-full rounded-xl border border-(--app-border) bg-(--app-surface-2) px-3 py-2 text-sm outline-none focus:border-(--app-accent) transition"
           />
         </div>
@@ -127,7 +146,7 @@ export default function SnippetEdit() {
             onChange={handleChange}
           />
           <label htmlFor="is_public" className="text-sm cursor-pointer">
-            Publikus snippet (mindenki láthatja az Explore oldalon)
+            Public snippet (everyone can see it in the Explorer)
           </label>
         </div>
 
@@ -142,16 +161,19 @@ export default function SnippetEdit() {
             type="submit"
             disabled={loading}
             className="rounded-2xl px-4 py-2 text-sm font-medium text-white disabled:opacity-60 transition"
-            style={{ background: 'linear-gradient(135deg, var(--app-primary), var(--app-secondary))' }}
+            style={{
+              background:
+                "linear-gradient(135deg, var(--app-primary), var(--app-secondary))",
+            }}
           >
-            {loading ? 'Mentés...' : 'Mentés'}
+            {loading ? "Save..." : "Save"}
           </button>
           <button
             type="button"
-            onClick={() => navigate('/snippets')}
+            onClick={() => navigate("/snippets")}
             className="rounded-2xl border border-(--app-border) bg-(--app-surface-2) px-4 py-2 text-sm hover:border-(--app-accent) transition"
           >
-            Mégse
+            Back
           </button>
         </div>
       </form>
