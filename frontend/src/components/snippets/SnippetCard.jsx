@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BiLike, BiSolidLike, BiDislike, BiSolidDislike } from "react-icons/bi";
-import { voteSnippet } from "../../api/snippetApi";
+import { BsStar, BsStarFill } from "react-icons/bs";
+import { voteSnippet, toggleFavorite } from "../../api/snippetApi";
 import { useAuth } from "../../context/AuthContext";
 
 export default function SnippetCard({ snippet, onDetail, onEdit, onDelete }) {
@@ -9,6 +10,7 @@ export default function SnippetCard({ snippet, onDetail, onEdit, onDelete }) {
   const [userVote, setUserVote] = useState(snippet.user_vote ?? null);
   const [upvotes, setUpvotes] = useState(parseInt(snippet.upvotes) || 0);
   const [downvotes, setDownvotes] = useState(parseInt(snippet.downvotes) || 0);
+  const [isFavorited, setIsFavorited] = useState(snippet.is_favorited ?? false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(snippet.code);
@@ -35,6 +37,16 @@ export default function SnippetCard({ snippet, onDetail, onEdit, onDelete }) {
 
       setUserVote(newVote);
     } catch {}
+  };
+
+  const handleFavorite = async () => {
+    if (!user) return;
+    try {
+      const res = await toggleFavorite(snippet.id);
+      setIsFavorited(res.data.favorited);
+    } catch {
+      console.error("Could not add to favorite");
+    }
   };
 
   return (
@@ -119,39 +131,59 @@ export default function SnippetCard({ snippet, onDetail, onEdit, onDelete }) {
           )}
         </div>
       </div>
-      <div className="flex items-center gap-4 pt-1">
-        <button
-          onClick={() => handleVote(true)}
-          disabled={!user}
-          className={[
-            "flex items-center gap-1.5 text-sm transition",
-            userVote === true
-              ? "text-(--app-primary)"
-              : "text-(--app-text-dim) hover:text-(--app-text)",
-            !user ? "opacity-40 cursor-not-allowed" : "",
-          ].join(" ")}
-        >
-          {userVote === true ? <BiSolidLike size={20} /> : <BiLike size={20} />}
-          <span>{upvotes}</span>
-        </button>
+      <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => handleVote(true)}
+            disabled={!user}
+            className={[
+              "flex items-center gap-1.5 text-sm transition",
+              userVote === true
+                ? "text-(--app-primary)"
+                : "text-(--app-text-dim) hover:text-(--app-text)",
+              !user ? "opacity-40 cursor-not-allowed" : "",
+            ].join(" ")}
+          >
+            {userVote === true ? (
+              <BiSolidLike size={20} />
+            ) : (
+              <BiLike size={20} />
+            )}
+            <span>{upvotes}</span>
+          </button>
+
+          <button
+            onClick={() => handleVote(false)}
+            disabled={!user}
+            className={[
+              "flex items-center gap-1.5 text-sm transition",
+              userVote === false
+                ? "text-(--app-primary)"
+                : "text-(--app-text-dim) hover:text-(--app-text)",
+              !user ? "opacity-40 cursor-not-allowed" : "",
+            ].join(" ")}
+          >
+            {userVote === false ? (
+              <BiSolidDislike size={20} />
+            ) : (
+              <BiDislike size={20} />
+            )}
+            <span>{downvotes}</span>
+          </button>
+        </div>
 
         <button
-          onClick={() => handleVote(false)}
+          onClick={handleFavorite}
           disabled={!user}
           className={[
             "flex items-center gap-1.5 text-sm transition",
-            userVote === false
-              ? "text-(--app-primary)"
-              : "text-(--app-text-dim) hover:text-(--app-text)",
+            isFavorited
+              ? "text-yellow-400"
+              : "text-(--app-text-dim) hover:text-yellow-400",
             !user ? "opacity-40 cursor-not-allowed" : "",
           ].join(" ")}
         >
-          {userVote === false ? (
-            <BiSolidDislike size={20} />
-          ) : (
-            <BiDislike size={20} />
-          )}
-          <span>{downvotes}</span>
+          {isFavorited ? <BsStarFill size={18} /> : <BsStar size={18} />}
         </button>
       </div>
     </div>

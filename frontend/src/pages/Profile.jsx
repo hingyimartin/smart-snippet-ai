@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { fetchProfile, updateProfile, changePassword } from "../api/userApi";
+import { fetchSnippets } from "../api/snippetApi";
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [snippets, setSnippets] = useState([]);
 
   const [form, setForm] = useState({
     username: "",
@@ -23,6 +25,12 @@ export default function Profile() {
   const [passSuccess, setPassSuccess] = useState(null);
   const [passError, setPassError] = useState(null);
   const [passLoading, setPassLoading] = useState(false);
+
+  useEffect(() => {
+    fetchSnippets()
+      .then((res) => setSnippets(res.data.snippets))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetchProfile()
@@ -247,6 +255,57 @@ export default function Profile() {
           {passLoading ? "Save..." : "Change password"}
         </button>
       </form>
+
+      <div className="rounded-3xl border border-(--app-border) bg-(--app-alt) p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold">My snippets</h2>
+          <a
+            href="/snippets"
+            className="text-xs text-(--app-text-dim) hover:text-(--app-text) transition"
+          >
+            All →
+          </a>
+        </div>
+
+        {snippets.length === 0 ? (
+          <p className="text-sm text-(--app-text-dim)">
+            You don't have any snippets yet...
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {snippets.slice(0, 5).map((s) => (
+              <div
+                key={s.id}
+                className="flex items-center justify-between rounded-xl border border-(--app-border) bg-(--app-surface-2) px-4 py-2.5 hover:border-(--app-accent) transition"
+              >
+                <div className="min-w-0">
+                  <div className="text-sm font-medium truncate">{s.title}</div>
+                  <div className="text-xs text-(--app-text-dim)">
+                    {s.language}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0 ml-4">
+                  {s.is_public ? (
+                    <span
+                      className="text-xs rounded-full px-2 py-0.5 text-white"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, var(--app-primary), var(--app-secondary))",
+                      }}
+                    >
+                      public
+                    </span>
+                  ) : (
+                    <span className="text-xs rounded-full border border-(--app-border) bg-(--app-alt) px-2 py-0.5 text-(--app-text-dim)">
+                      private
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

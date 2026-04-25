@@ -41,19 +41,20 @@ export const getSnippets = async (req, res) => {
       `SELECT s.*,
         COUNT(v.id) FILTER (WHERE v.vote_type = true)  AS upvotes,
         COUNT(v.id) FILTER (WHERE v.vote_type = false) AS downvotes,
-        BOOL_OR(CASE WHEN v.user_id = $1 THEN v.vote_type ELSE NULL END) AS user_vote
-        FROM snippets s
-        LEFT JOIN snippet_votes v ON s.id = v.snippet_id
-        WHERE s.user_id = $1
-        GROUP BY s.id
-        ORDER BY s.created_at DESC`,
+        BOOL_OR(CASE WHEN v.user_id = $1 THEN v.vote_type ELSE NULL END) AS user_vote,
+        BOOL_OR(f.user_id = $1) AS is_favorited
+       FROM snippets s
+       LEFT JOIN snippet_votes v ON s.id = v.snippet_id
+       LEFT JOIN snippet_favorites f ON s.id = f.snippet_id
+       WHERE s.user_id = $1
+       GROUP BY s.id
+       ORDER BY s.created_at DESC`,
       [userId],
     );
 
     res.json({ snippets: result.rows });
   } catch (err) {
-    console.error("Get snippets hiba:", err);
-    res.status(500).json({ error: "Szerver hiba." });
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -140,10 +141,12 @@ export const getPublicSnippets = async (req, res) => {
       `SELECT s.*, u.username,
         COUNT(v.id) FILTER (WHERE v.vote_type = true)  AS upvotes,
         COUNT(v.id) FILTER (WHERE v.vote_type = false) AS downvotes,
-        BOOL_OR(CASE WHEN v.user_id = $1 THEN v.vote_type ELSE NULL END) AS user_vote
+        BOOL_OR(CASE WHEN v.user_id = $1 THEN v.vote_type ELSE NULL END) AS user_vote,
+        BOOL_OR(f.user_id = $1) AS is_favorited
        FROM snippets s
        JOIN users u ON s.user_id = u.id
        LEFT JOIN snippet_votes v ON s.id = v.snippet_id
+       LEFT JOIN snippet_favorites f ON s.id = f.snippet_id
        WHERE s.is_public = true
        GROUP BY s.id, u.username
        ORDER BY s.created_at DESC`,
@@ -152,7 +155,6 @@ export const getPublicSnippets = async (req, res) => {
 
     res.json({ snippets: result.rows });
   } catch (err) {
-    console.error("Get public snippets hiba:", err);
-    res.status(500).json({ error: "Szerver hiba." });
+    res.status(500).json({ error: "Server error" });
   }
 };

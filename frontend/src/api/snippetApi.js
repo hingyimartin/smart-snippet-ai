@@ -9,3 +9,6 @@ export const fetchPublicSnippets = () => api.get("/snippets/explore");
 
 export const voteSnippet = (id, vote_type) =>
   api.post(`/snippets/${id}/vote`, { vote_type });
+
+export const toggleFavorite = (id) => api.post(`/snippets/${id}/favorite`);
+export const fetchFavorites = () => api.get("/snippets/favorites");
