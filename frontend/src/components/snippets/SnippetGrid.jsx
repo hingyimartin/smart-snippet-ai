@@ -10,6 +10,8 @@ import {
 import { BsStar, BsStarFill } from "react-icons/bs";
 import { voteSnippet, toggleFavorite } from "../../api/snippetApi";
 import { useAuth } from "../../context/AuthContext";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 function SnippetGridItem({ snippet, onDetail, onEdit, onDelete }) {
   const { user } = useAuth();
@@ -114,9 +116,17 @@ function SnippetGridItem({ snippet, onDetail, onEdit, onDelete }) {
         >
           {copied ? <BiCheck size={18} /> : <BiCopy size={18} />}
         </button>
-        <pre className="rounded-xl bg-(--app-surface-2) p-3 text-xs overflow-x-auto">
-          <code>{snippet.code}</code>
-        </pre>
+        <SyntaxHighlighter
+          language={snippet.language}
+          style={oneLight}
+          customStyle={{
+            borderRadius: "0.75rem",
+            fontSize: "0.75rem",
+            margin: 0,
+          }}
+        >
+          {snippet.code}
+        </SyntaxHighlighter>
       </div>
 
       <div className="flex gap-2 mt-auto pt-2">
