@@ -1,5 +1,17 @@
 import { useEffect, useState } from "react";
-import { BiCheck, BiCopy } from "react-icons/bi";
+import {
+  BiCheck,
+  BiCopy,
+  BiLike,
+  BiSolidLike,
+  BiDislike,
+  BiSolidDislike,
+} from "react-icons/bi";
+import { BsStar, BsStarFill } from "react-icons/bs";
+import { voteSnippet, toggleFavorite } from "../../api/snippetApi";
+import { useAuth } from "../../context/AuthContext";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const formatDate = (dateStr) => {
   return new Date(dateStr).toLocaleString("hu-HU", {
@@ -12,7 +24,21 @@ const formatDate = (dateStr) => {
 };
 
 export default function SnippetDetail({ snippet, onClose }) {
+  const { user } = useAuth();
   const [copied, setCopied] = useState(false);
+  const [userVote, setUserVote] = useState(null);
+  const [upvotes, setUpvotes] = useState(0);
+  const [downvotes, setDownvotes] = useState(0);
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  useEffect(() => {
+    if (snippet) {
+      setUserVote(snippet.user_vote ?? null);
+      setUpvotes(parseInt(snippet.upvotes) || 0);
+      setDownvotes(parseInt(snippet.downvotes) || 0);
+      setIsFavorited(snippet.is_favorited ?? false);
+    }
+  }, [snippet]);
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -26,6 +52,33 @@ export default function SnippetDetail({ snippet, onClose }) {
     navigator.clipboard.writeText(snippet.code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleVote = async (type) => {
+    if (!user) return;
+    try {
+      const res = await voteSnippet(snippet.id, type);
+      const newVote = res.data.vote;
+      setUpvotes((prev) => {
+        if (userVote === true) prev -= 1;
+        if (newVote === true) prev += 1;
+        return prev;
+      });
+      setDownvotes((prev) => {
+        if (userVote === false) prev -= 1;
+        if (newVote === false) prev += 1;
+        return prev;
+      });
+      setUserVote(newVote);
+    } catch {}
+  };
+
+  const handleFavorite = async () => {
+    if (!user) return;
+    try {
+      const res = await toggleFavorite(snippet.id);
+      setIsFavorited(res.data.favorited);
+    } catch {}
   };
 
   if (!snippet) return null;
@@ -117,9 +170,71 @@ export default function SnippetDetail({ snippet, onClose }) {
           >
             {copied ? <BiCheck size={18} /> : <BiCopy size={18} />}
           </button>
-          <pre className="rounded-xl bg-(--app-surface-2) p-4 text-xs overflow-x-auto">
-            <code>{snippet.code}</code>
-          </pre>
+          <SyntaxHighlighter
+            language={snippet.language}
+            style={oneLight}
+            customStyle={{
+              borderRadius: "0.75rem",
+              fontSize: "0.75rem",
+              margin: 0,
+            }}
+          >
+            {snippet.code}
+          </SyntaxHighlighter>
+        </div>
+
+        <div className="flex items-center justify-between pt-1 pb-4 border-t border-(--app-border)">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => handleVote(true)}
+              disabled={!user}
+              className={[
+                "flex items-center gap-1.5 text-sm transition",
+                userVote === true
+                  ? "text-(--app-primary)"
+                  : "text-(--app-text-dim) hover:text-(--app-text)",
+                !user ? "opacity-40 cursor-not-allowed" : "",
+              ].join(" ")}
+            >
+              {userVote === true ? (
+                <BiSolidLike size={20} />
+              ) : (
+                <BiLike size={20} />
+              )}
+              <span>{upvotes}</span>
+            </button>
+            <button
+              onClick={() => handleVote(false)}
+              disabled={!user}
+              className={[
+                "flex items-center gap-1.5 text-sm transition",
+                userVote === false
+                  ? "text-(--app-primary)"
+                  : "text-(--app-text-dim) hover:text-(--app-text)",
+                !user ? "opacity-40 cursor-not-allowed" : "",
+              ].join(" ")}
+            >
+              {userVote === false ? (
+                <BiSolidDislike size={20} />
+              ) : (
+                <BiDislike size={20} />
+              )}
+              <span>{downvotes}</span>
+            </button>
+          </div>
+          <button
+            onClick={handleFavorite}
+            disabled={!user}
+            className={[
+              "flex items-center gap-1.5 text-sm transition",
+              isFavorited
+                ? "text-yellow-400"
+                : "text-(--app-text-dim) hover:text-yellow-400",
+              !user ? "opacity-40 cursor-not-allowed" : "",
+            ].join(" ")}
+          >
+            {isFavorited ? <BsStarFill size={18} /> : <BsStar size={18} />}
+          </button>
         </div>
       </div>
     </div>

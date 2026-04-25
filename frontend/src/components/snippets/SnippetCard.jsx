@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { BiLike, BiSolidLike, BiDislike, BiSolidDislike } from "react-icons/bi";
+import {
+  BiLike,
+  BiSolidLike,
+  BiDislike,
+  BiSolidDislike,
+  BiCopy,
+  BiCheck,
+} from "react-icons/bi";
 import { BsStar, BsStarFill } from "react-icons/bs";
 import { voteSnippet, toggleFavorite } from "../../api/snippetApi";
 import { useAuth } from "../../context/AuthContext";
@@ -92,7 +99,7 @@ export default function SnippetCard({ snippet, onDetail, onEdit, onDelete }) {
               : "border-(--app-border) bg-(--app-alt) text-(--app-text-dim) hover:border-(--app-accent)",
           ].join(" ")}
         >
-          {copied ? "✓ Copied!" : "Copy"}
+          {copied ? <BiCheck size={18} /> : <BiCopy size={18} />}
         </button>
         <pre className="rounded-xl bg-(--app-surface-2) p-3 text-xs overflow-x-auto">
           <code>{snippet.code}</code>

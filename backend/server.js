@@ -5,6 +5,7 @@ import "./config/db.js";
 import authRoutes from "./routes/auth.js";
 import snippetRoutes from "./routes/snippets.js";
 import userRoutes from "./routes/users.js";
+import aiRoutes from "./routes/ai.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/snippets", snippetRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/ai", aiRoutes);
 
 const PORT = 3000;
 

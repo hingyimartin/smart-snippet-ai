@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchProfile, updateProfile, changePassword } from "../api/userApi";
 import { fetchSnippets } from "../api/snippetApi";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
@@ -255,6 +256,15 @@ export default function Profile() {
           {passLoading ? "Save..." : "Change password"}
         </button>
       </form>
+
+      <div className="flex justify-start">
+        <Link
+          to="/favorites"
+          className="rounded-2xl border border-(--app-border) bg-(--app-surface-2) px-4 py-2 text-sm hover:border-(--app-accent) transition cursor-pointer"
+        >
+          ⭐ Favorite snippets →
+        </Link>
+      </div>
 
       <div className="rounded-3xl border border-(--app-border) bg-(--app-alt) p-6 space-y-4">
         <div className="flex items-center justify-between">

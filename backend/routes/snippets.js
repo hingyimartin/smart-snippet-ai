@@ -7,7 +7,7 @@ import {
   deleteSnippet,
   getPublicSnippets,
 } from "../controllers/snippetController.js";
-import { authenticateToken } from "../middleware/auth.js";
+import { authenticateToken, optionalAuth } from "../middleware/auth.js";
 import { vote } from "../controllers/voteController.js";
 import {
   toggleFavorite,
@@ -19,7 +19,7 @@ router.get("/favorites", authenticateToken, getFavorites);
 router.post("/:id/favorite", authenticateToken, toggleFavorite);
 router.post("/", authenticateToken, createSnippet);
 router.get("/", authenticateToken, getSnippets);
-router.get("/explore", getPublicSnippets);
+router.get("/explore", optionalAuth, getPublicSnippets);
 router.get("/:id", authenticateToken, getSnippetById);
 router.put("/:id", authenticateToken, updateSnippet);
 router.delete("/:id", authenticateToken, deleteSnippet);

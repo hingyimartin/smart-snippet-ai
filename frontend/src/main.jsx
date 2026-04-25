@@ -18,6 +18,7 @@ import Explore from "./pages/Explore";
 import SnippetNew from "./pages/SnippetNew";
 import SnippetEdit from "./pages/SnippetEdit";
 import Profile from "./pages/Profile";
+import Favorites from "./pages/Favorites";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -61,6 +62,14 @@ createRoot(document.getElementById("root")).render(
                 element={
                   <ProtectedRoute>
                     <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/favorites"
+                element={
+                  <ProtectedRoute>
+                    <Favorites />
                   </ProtectedRoute>
                 }
               />
