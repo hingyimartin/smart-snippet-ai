@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import LeftSidebar from "./LeftSidebar";
 import RightPanel from "./RightPanel";
+import Footer from "./Footer";
 import { SnippetProvider } from "../../context/SnippetContext";
 
 export default function Layout({ children }) {
@@ -30,6 +31,7 @@ export default function Layout({ children }) {
               <main className="flex-1 min-w-0 overflow-y-auto no-scrollbar px-4 md:px-6 py-6">
                 <div className="mx-auto w-full">{children}</div>
               </main>
+              <Footer />
             </div>
 
             <RightPanel

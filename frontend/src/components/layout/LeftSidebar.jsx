@@ -8,14 +8,22 @@ const publicRoutes = [
 
 const privateRoutes = [
   { to: "/snippets", label: "Snippets" },
-  { to: "/profile", label: "Profil" },
+  { to: "/profile", label: "Profile" },
 ];
+
+const adminRoutes = [{ to: "/admin", label: "Admin" }];
 
 export default function LeftSidebar() {
   const { pathname } = useLocation();
   const { user, logout } = useAuth();
 
-  const navItems = user ? [...publicRoutes, ...privateRoutes] : publicRoutes;
+  const navItems = user
+    ? [
+        ...publicRoutes,
+        ...privateRoutes,
+        ...(user.role === "admin" ? adminRoutes : []),
+      ]
+    : publicRoutes;
 
   return (
     <aside className="hidden md:flex w-72 flex-col border-r border-(--app-border) bg-(--app-alt)">

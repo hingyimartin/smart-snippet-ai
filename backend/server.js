@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.js";
 import snippetRoutes from "./routes/snippets.js";
 import userRoutes from "./routes/users.js";
 import aiRoutes from "./routes/ai.js";
+import adminRoutes from "./routes/admin.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/snippets", snippetRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = 3000;
 

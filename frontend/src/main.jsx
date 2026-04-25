@@ -19,6 +19,8 @@ import SnippetNew from "./pages/SnippetNew";
 import SnippetEdit from "./pages/SnippetEdit";
 import Profile from "./pages/Profile";
 import Favorites from "./pages/Favorites";
+import Admin from "./pages/Admin";
+import Sitemap from "./pages/Sitemap";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -73,6 +75,15 @@ createRoot(document.getElementById("root")).render(
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <Admin />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/sitemap" element={<Sitemap />} />
             </Routes>
           </Layout>
         </ToastProvider>
